@@ -18,7 +18,7 @@ int main()
 	int addr=0;
 	int len=0;
 	char filter;
-	int data;
+	//int data;
 	char buffer[1001]={0};
 	unsigned long actual_write_len=0;
 	printf("Ğ´ÈëµÄ»ùÖ·:");
