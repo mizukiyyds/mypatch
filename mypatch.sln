@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "004劫持补丁", "004劫�
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "005反int3断点", "005反int3断点\005反int3断点.vcxproj", "{E5FBF87A-EF5C-4160-9B11-6481DE7ABA18}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "006异常处理硬件断点", "006异常处理硬件断点\006异常处理硬件断点.vcxproj", "{A5334BD4-9CF0-4664-9F4C-B22CF85ACAA0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -41,6 +43,14 @@ Global
 		{E5FBF87A-EF5C-4160-9B11-6481DE7ABA18}.Release|x64.Build.0 = Release|x64
 		{E5FBF87A-EF5C-4160-9B11-6481DE7ABA18}.Release|x86.ActiveCfg = Release|Win32
 		{E5FBF87A-EF5C-4160-9B11-6481DE7ABA18}.Release|x86.Build.0 = Release|Win32
+		{A5334BD4-9CF0-4664-9F4C-B22CF85ACAA0}.Debug|x64.ActiveCfg = Debug|x64
+		{A5334BD4-9CF0-4664-9F4C-B22CF85ACAA0}.Debug|x64.Build.0 = Debug|x64
+		{A5334BD4-9CF0-4664-9F4C-B22CF85ACAA0}.Debug|x86.ActiveCfg = Debug|Win32
+		{A5334BD4-9CF0-4664-9F4C-B22CF85ACAA0}.Debug|x86.Build.0 = Debug|Win32
+		{A5334BD4-9CF0-4664-9F4C-B22CF85ACAA0}.Release|x64.ActiveCfg = Release|x64
+		{A5334BD4-9CF0-4664-9F4C-B22CF85ACAA0}.Release|x64.Build.0 = Release|x64
+		{A5334BD4-9CF0-4664-9F4C-B22CF85ACAA0}.Release|x86.ActiveCfg = Release|Win32
+		{A5334BD4-9CF0-4664-9F4C-B22CF85ACAA0}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -15,16 +15,8 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\study\滴水NCK课件\NCK第一期课件 合集\作业课件\第04课\课堂示例\劫持补丁源码_C语言\winspool\winspool\winspool.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\..\study\滴水NCK课件\NCK第一期课件 合集\作业课件\第04课\课堂示例\劫持补丁源码_C语言\winspool\winspool\stdafx.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\study\滴水NCK课件\NCK第一期课件 合集\作业课件\第04课\课堂示例\劫持补丁源码_C语言\winspool\winspool\targetver.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
