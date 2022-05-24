@@ -16,7 +16,7 @@ Label:
 
 然后用ida分析
 
-![image-20220524111337263](C:\Users\Admin\AppData\Roaming\Typora\typora-user-images\image-20220524111337263.png)
+![image-20220524111337263](https://github.com/mizukiyyds/mypatch/blob/master/KeyGenMe分析/image/image-20220524111337263.png)
 
 
 
@@ -24,7 +24,7 @@ Label:
 
 
 
-![image-20220524111424088](C:\Users\Admin\AppData\Roaming\Typora\typora-user-images\image-20220524111424088.png)
+![image-20220524111424088](https://github.com/mizukiyyds/mypatch/blob/master/KeyGenMe分析/image/image-20220524111424088.png)
 
 二重循环里即加密方法， 一个数组与输入的字符串每一位异或
 
@@ -34,7 +34,7 @@ Label:
 
 
 
-![image-20220524112049073](C:\Users\Admin\AppData\Roaming\Typora\typora-user-images\image-20220524112049073.png)
+![image-20220524112049073](https://github.com/mizukiyyds/mypatch/blob/master/KeyGenMe分析/image/image-20220524112049073.png)
 
 
 
@@ -46,13 +46,13 @@ str1[i] = int(‘n') ^ (str[i] + 13)
 
 
 
-![image-20220524113245819](C:\Users\Admin\AppData\Roaming\Typora\typora-user-images\image-20220524113245819.png)
+![image-20220524113245819](https://github.com/mizukiyyds/mypatch/blob/master/KeyGenMe分析/image/image-20220524113245819.png)
 
 发现计算得出的字符串很有特征，应该为真码，于是扔到去除花指令的程序试了一下，发现失败，感觉很蹊跷，怀疑是修改花指令的时候出现问题，于是去原程序那里输入，发现提示注册成功
 
 
 
-![image-20220524113522628](C:\Users\Admin\AppData\Roaming\Typora\typora-user-images\image-20220524113522628.png)
+![image-20220524113522628](https://github.com/mizukiyyds/mypatch/blob/master/KeyGenMe分析/image/image-20220524113522628.png)
 
 
 
