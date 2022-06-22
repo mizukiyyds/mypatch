@@ -9,6 +9,108 @@ void (*junk_code_begin[101])();
 void (*junk_code_end[101])();
 
 
+#if defined(__GNUC__)
+#define FORCEDINLINE  __attribute__((always_inline))
+#else 
+#define FORCEDINLINE
+#endif
+
+namespace protect
+{
+
+
+	void push_param(const int& param1,const int& param2)
+	{
+		int_param1=param1;
+		int_param2=param2;
+	}
+	enum protect_type
+	{
+		type_nor	//基于或非运算模拟其他运算
+	};
+	inline int nor_(int n,int m)
+	{
+		return ~(n|m);
+	}
+	
+	inline int not_(int n)
+	{
+		return nor_(n,n);
+	}
+	inline int and_(int n,int m)
+	{
+		return nor_(not_(n),not_(m));
+	}
+	inline int or_(int n,int m)
+	{
+		return not_(nor_(n,m));
+	}
+	inline int xor_(int n,int m)
+	{
+		return or_(nor_(not_(n),m),nor_(n,not_(m)));
+	}
+	inline int xnor(int n,int m)
+	{
+		return not_(xor_(n,m));
+	}
+	inline int shl_(int n)
+	{
+		__asm{
+			shl n,0x1;
+		}
+		return n;
+	}
+	inline int shr_(int n)
+	{
+		__asm{
+			shr n,0x1;
+		}
+		return n;
+	}
+	
+
+	/**
+	 * \brief 模拟加法
+	 * n+m = n^m + (n&m)*2
+	 * \return 
+	 */
+	/*template<typename T> 
+	int operator+(int n,T m)
+	{
+		cout<<"模拟加法\n";
+		int result=xor_(n,m)+shl_(and_(n,m));
+		return result;
+	}*/
+	inline int add(int n,int m,protect_type type = type_nor)
+	{
+		if(type==type_nor)
+		{
+			return xor_(n,m)+shl_(and_(n,m));
+		}
+		
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+	// #define not_(n) (nor_(n,n));
+// #define and_(n, m) (nor_(not_(n),not_(m)));
+// #define or_(n, m) (not_(nor_(n,m)));
+// #define xor_(n, m) (or_(nor_(not_(n),m),nor_(n,not_(m))));
+// #define xnor_(n, m) (not_(xor_(n,m)));
+// #define shl_(n) (n<<1);
+// #define shr_(n) (n>>1);
+
+}
+
 /**
  * \brief 流程：开始 -> my_junk_code_end1 -> 返回到标签back -> 跳转到 to_end -> 跳转到 real_end
  * 初始化代码处可以直接调用自己的函数，简洁

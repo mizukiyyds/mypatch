@@ -5,23 +5,30 @@
 #include "myprotect.h"
 using namespace std;
 char info[100];
-void msg1()
+void func1()
 {
-	cout<<"这是第一个函数\n";
-	MessageBoxA(0,"这是第一个函数","标题",MB_TOPMOST|MB_OK);
+	int a=111,b=234;
+	__asm{
+		nop
+		nop
+		nop
+		nop
+	}
+	cout<<"模拟加法："<< protect::add(a,b)<<endl;
 	
 }
-void msg2()
+void func2()
 {
-	cout<<"这是第二个函数\n";
-	MessageBoxA(0,"这是第一个函数","标题",MB_TOPMOST|MB_OK);
+
 }
 int main()
 {
-	strcpy(info,"initial_begin");
+	//strcpy(info,"initial_begin");
 	//initialize();
-	strcpy(info,"initial_end");
-	my_junk_code_begin1(msg1,msg2);
+	//strcpy(info,"initial_end");
+	
+	my_junk_code_begin1(func1,func2);
+
 	system("pause");
 
 }
