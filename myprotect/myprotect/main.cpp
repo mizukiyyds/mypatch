@@ -14,7 +14,10 @@ void func1()
 		nop
 		nop
 	}
-	cout<<"模拟加法："<< protect::add(a,b)<<endl;
+	int c=protect::add(a,b,protect::type_rand);
+	cout<<"模拟加法："<< c<<endl;
+	c=protect::xor_(a,b, protect::type_rand);
+	cout<<"模拟异或："<< c<<endl;
 	
 }
 void func2()
@@ -24,7 +27,7 @@ void func2()
 int main()
 {
 	//strcpy(info,"initial_begin");
-	//initialize();
+	initialize();
 	//strcpy(info,"initial_end");
 	
 	my_junk_code_begin1(func1,func2);
