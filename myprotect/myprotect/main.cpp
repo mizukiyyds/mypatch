@@ -14,11 +14,15 @@ void func1()
 		nop
 		nop
 	}
-	int c=protect::add(a,b,protect::type_rand);
-	cout<<"模拟加法："<< c<<endl;
-	c=protect::xor_(a,b, protect::type_rand);
-	cout<<"模拟异或："<< c<<endl;
-	
+	int c=protect::add(a,-b,protect::type_default);
+	cout<<"加法："<< c<<endl;
+	c=protect::sub(a,b, protect::type_default);
+	cout<<"减法："<< c<<endl;
+	c=1234;
+	c=protect::shl_(c,2);
+	cout<<"左移："<< c<<endl;
+	c=protect::shr_(c,1);
+	cout<<"右移："<< c<<endl;
 }
 void func2()
 {
@@ -26,12 +30,9 @@ void func2()
 }
 int main()
 {
-	//strcpy(info,"initial_begin");
-	initialize();
-	//strcpy(info,"initial_end");
-	
-	my_junk_code_begin1(func1,func2);
-
+	system("title mizuki");
+	system("color 3e");
+	protect::initialize();
+	insert_junk_code_1(func1);
 	system("pause");
-
 }

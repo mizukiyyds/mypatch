@@ -5,41 +5,38 @@ using namespace std;
 
 #include "myprotect.h"
 
-void (*junk_code_begin[101])();
-void (*junk_code_end[101])();
 
 
-#if defined(__GNUC__)
-#define FORCEDINLINE  __attribute__((always_inline))
-#else 
-#define FORCEDINLINE
-#endif
 
 namespace protect
 {
 
+	extern void initialize()
+	{
+		srand((unsigned int)(time(nullptr)));
 
-	void push_param(const int& param1, const int& param2)
+	}
+	void push_param(const long long& param1, const long long& param2)
 	{
 		int_param1 = param1;
 		int_param2 = param2;
 	}
-	inline int get_rand(int l,int r)
+	extern long long get_rand(const long long &l,const long long &r)
 	{
 		rand_n=l+rand()%(r-l+1);
 		return rand_n;
 	}
 
 
-	inline int nor_(int n, int m)
+	extern long long nor_(const long long &n, const long long &m)
 	{
 		return ~(n | m);
 	}
-	inline int nand_(int n, int m)
+	extern long long nand_(const long long &n, const long long &m)
 	{
 		return ~(n & m);
 	}
-	inline int not_(int n, protect_type type)
+	extern long long not_(const long long &n, protect_type type)
 	{
 		if(type==type_default) type=type_nor;
 		const protect_type org = type;
@@ -52,7 +49,7 @@ namespace protect
 		last_error_code = error_invalid_protect_type;
 		return -1;
 	}
-	inline int and_(int n, int m, protect_type type)
+	extern long long and_(const long long &n, const long long &m, protect_type type)
 	{
 		if(type==type_default) type=type_nor;
 		const protect_type org = type;
@@ -65,7 +62,7 @@ namespace protect
 		last_error_code = error_invalid_protect_type;
 		return -1;
 	}
-	inline int or_(int n, int m, protect_type type)
+	extern long long or_(const long long &n, const long long &m, protect_type type)
 	{
 		if(type==type_default) type=type_nor;
 		const protect_type org = type;
@@ -78,7 +75,7 @@ namespace protect
 		last_error_code = error_invalid_protect_type;
 		return -1;
 	}
-	inline int xor_(int n, int m, protect_type type)
+	extern long long xor_(const long long &n, const long long &m, protect_type type)
 	{
 		if(type==type_default) type=type_nor;
 		const protect_type org = type;
@@ -91,7 +88,7 @@ namespace protect
 		last_error_code = error_invalid_protect_type;
 		return -1;
 	}
-	inline int xnor(int n, int m, protect_type type)
+	extern long long xnor(const long long &n, const long long &m, protect_type type)
 	{
 		if(type==type_default) type=type_nor;
 		const protect_type org = type;
@@ -104,67 +101,61 @@ namespace protect
 		last_error_code = error_invalid_protect_type;
 		return -1;
 	}
-	inline int shl_(int n)
+	extern long long shl_(const long long &n,const long long &m)
 	{
-		__asm {
-			shl n, 1;
-		}
-		return n;
+		return n<<m;
 	}
-	inline int shr_(int n)
+	extern long long shr_(const long long &n,const long long &m)
 	{
-		__asm {
-			shr n, 1;
+		//111000110   n<<1
+		//011100011   n
+		//异或得到 n<<1与n不同的位
+		//mask/2得到n与n>>1不同的位
+		//xor得到结果
+		long long result=n;
+		for(int i=1;i<=m;++i)
+		{
+			long long sh=shl_(result,1);
+			long long mask1=xor_(sh,result);
+			mask1/=2;
+			result= xor_(n,mask1);
 		}
-		return n;
+		return result;
 	}
 
-
-	/**
-	 * \brief 模拟加法
-	 * n+m = n^m + (n&m)*2
-	 * \return
-	 */
-	 /*template<typename T>
-	 int operator+(int n,T m)
-	 {
-		 cout<<"模拟加法\n";
-		 int result=xor_(n,m)+shl_(and_(n,m));
-		 return result;
-	 }*/
-	int add(int n, int m, protect_type type)
+	extern long long add(const long long &n, const long long &m, protect_type type)
 	{
 		const protect_type org = type;
-		return xor_(n, m, org) + shl_(and_(n, m, org));
+		return xor_(n, m, org) + shl_(and_(n, m, org),1);
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-	// #define not_(n) (nor_(n,n));
-// #define and_(n, m) (nor_(not_(n),not_(m)));
-// #define or_(n, m) (not_(nor_(n,m)));
-// #define xor_(n, m) (or_(nor_(not_(n),m),nor_(n,not_(m))));
-// #define xnor_(n, m) (not_(xor_(n,m)));
-// #define shl_(n) (n<<1);
-// #define shr_(n) (n>>1);
-
+	extern long long sub(const long long &n, const long long &m, protect_type type)
+	{
+		return add(n,-m,type);
+	}
+	extern long long mul(const long long &n, const long long &m, protect_type type)
+	{
+		const protect_type org = type;
+		
+		last_error_code = error_invalid_protect_type;
+		return -1;
+	}
 }
 
+
+
+
+
+
+
 /**
- * \brief 流程：开始 -> my_junk_code_end1 -> 返回到标签back -> 跳转到 to_end -> 跳转到 real_end
- * 初始化代码处可以直接调用自己的函数，简洁
- *
+ * \brief 插入一段花指令，让两个函数在花指令中间执行
+ * 参数：两个void类型的函数指针，让函数在花指令中间执行
+ * 参数为空则相当于直接插入一长段无用花指令
+ * 注意：不是给函数里面的代码插入花指令
+ * 
+ *流程：开始 -> my_junk_code_end1 -> 返回到标签back -> 跳转到 to_end -> 跳转到 real_end ->next_user_code
  */
-void my_junk_code_begin1(void(*func1)(), void(*func2)())
+extern void insert_junk_code_1(void(*func1)(), void(*func2)())
 {
 	int ret_address = 0;
 	__asm
@@ -176,7 +167,7 @@ void my_junk_code_begin1(void(*func1)(), void(*func2)())
 		mov ret_address, 0x114514;	//垃圾指令
 		pushad;						//保存当前寄存器
 		mov edx, func1;				//将func1传递给下面函数执行
-		call  my_junk_code_end1;
+		call  insert_junk_code_1_part2;
 
 		//任意输入垃圾代码----------------
 		pushad;
@@ -216,11 +207,13 @@ void my_junk_code_begin1(void(*func1)(), void(*func2)())
 		//--------------------------------
 	to_end:
 		push func2;
+		push next_user_code;
 		jmp ebx;
+		next_user_code:
 	}
 };
 
-void my_junk_code_end1()
+extern void insert_junk_code_1_part2()
 {
 	void(*func1)() = nullptr;
 	void(*func2)() = nullptr;
@@ -231,7 +224,7 @@ void my_junk_code_end1()
 
 		//添加你的花指令（不是任意指令）------
 		push 0x114514
-			mov ebx, 0x1919810;
+		mov ebx, 0x1919810;
 		mov ecx, 0x5201314;
 		mov edx, 0x654321;
 		sub edx, ecx;
@@ -284,7 +277,7 @@ void my_junk_code_end1()
 		in eax, dx;
 		pushad;
 		__emit 0xff; __emit 0x25; __emit 0xE8; __emit 0xE8; __emit 0x68; __emit 0x69;
-		lea eax, my_junk_code_end1;
+		lea eax, insert_junk_code_1_part2;
 		call eax;
 		mov ecx, 00011451;
 		mov edx, 41919810;
@@ -343,18 +336,6 @@ void my_virtual_code_begin1()
 	}
 
 }
-void my_virtual_code_end1()
-{
-	__asm
-	{
-		//virtual_end:
 
-	}
-}
 
-void initialize()
-{
-	srand((unsigned int)(time(nullptr)));
-	//junk_code_begin[1] = (void(*)())my_junk_code_begin1;
-	//junk_code_end[1] = my_junk_code_end1;
-}
+

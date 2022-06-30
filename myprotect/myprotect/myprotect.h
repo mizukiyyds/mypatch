@@ -3,31 +3,21 @@
 
 
 
-void my_junk_code_begin1(void(*func1)() ,void(*func2)());
-void my_junk_code_end1();
 
 
-extern void (*junk_code_begin[101])();
-
-extern void (*junk_code_end[101])();
-
-
-void initialize();
-
-
-/**
- * \brief 首先调用push_param传递参数，再用其他函数
- */
 namespace protect
 {
 
-	static int int_param1;
-	static int int_param2;
-	static int rand_n;
-	extern void push_param(const int& int_param1,const int& int_param2);
-	extern __forceinline int get_rand(int l,int r);
+	static long long int_param1;
+	static long long int_param2;
+	static long long rand_n;
 
-	const int protect_types=4;
+
+	void initialize();				//初始化函数
+	extern void push_param(const long long& int_param1,const long long& int_param2);
+	extern __forceinline long long get_rand(const long long &l,const long long &r);
+
+	const long long protect_types=4;
 	enum protect_type
 	{
 		type_default,
@@ -35,18 +25,19 @@ namespace protect
 		type_nand,		//基于与非运算
 		type_rand,		//基于与非运算
 	};
-	extern __forceinline int nor_(int n,int m);
-	extern __forceinline int nand_(int n,int m);
-	extern __forceinline int not_(int n,protect_type = type_default);
-	extern __forceinline int and_(int n,int m,protect_type = type_default);
-	extern __forceinline int or_(int n,int m,protect_type = type_default);
-	extern __forceinline int xor_(int n,int m,protect_type = type_default);
-	extern __forceinline int xnor(int n,int m,protect_type = type_default);
-	extern __forceinline int shl_(int n);
-	extern __forceinline int shr_(int n);
+	__forceinline long long nor_(const long long &n,const long long &m);
+	__forceinline long long nand_(const long long &n,const long long &m);
+	__forceinline long long not_(const long long &n,protect_type = type_default);
+	__forceinline long long and_(const long long &n,const long long &m,protect_type = type_default);
+	__forceinline long long or_(const long long &n,const long long &m,protect_type = type_default);
+	__forceinline long long xor_(const long long &n,const long long &m,protect_type = type_default);
+	__forceinline long long xnor(const long long &n,const long long &m,protect_type = type_default);
+	__forceinline long long shl_(const long long &n,const long long &m);
+	__forceinline long long shr_(const long long &n,const long long &m);
 	
 	//<typename T> T operator+(T n,T m);
-	extern  __forceinline int add(int n,int m,protect_type = type_default);
+	__forceinline long long add(const long long &n,const long long &m,protect_type = type_default);
+	__forceinline long long sub(const long long &n,const long long &m,protect_type = type_default);
 
 
 
@@ -58,4 +49,14 @@ namespace protect
 	};
 	static last_error last_error_code=success;
 
-};
+
+
+
+	
+
+
+	
+}
+
+__forceinline void insert_junk_code_1(void(*func1)()=nullptr ,void(*func2)()=nullptr);
+inline void insert_junk_code_1_part2();;
