@@ -71,12 +71,10 @@ namespace protect
 
 	long long nor_(const long long& n, const long long& m)
 	{
-		insert_junk_code_1();
 		return ~(n | m);
 	}
 	long long nand_(const long long& n, const long long& m)
 	{
-		insert_junk_code_1();
 		return ~(n & m);
 	}
 	long long not_(const long long& n, protect_type type)
@@ -316,12 +314,13 @@ void insert_junk_code_1(void(*func1)(), void(*func2)())
 	int ret_address = 0;
 	__asm
 	{
+		pushad;						//保存当前寄存器
 		mov edx, back;
 		mov ret_address, 0x114514;	//垃圾指令
 		mov ret_address, edx;		//取真正返回地址back
 		push ret_address;			//将真正返回地址压栈
 		mov ret_address, 0x114514;	//垃圾指令
-		pushad;						//保存当前寄存器
+		
 		mov edx, func1;				//将func1传递给下面函数执行
 		call  insert_junk_code_1_part2;
 
@@ -367,6 +366,7 @@ void insert_junk_code_1(void(*func1)(), void(*func2)())
 		jmp ebx;
 
 	next_user_code:
+		popad;
 		//花指令结束，这接着就是后面的代码了
 	}
 
@@ -383,7 +383,7 @@ void insert_junk_code_1_part2()
 
 		//添加你的花指令（不是任意指令）------
 		push 0x114514
-			mov ebx, 0x1919810;
+		mov ebx, 0x1919810;
 		mov ecx, 0x5201314;
 		mov edx, 0x654321;
 		sub edx, ecx;
@@ -405,9 +405,9 @@ void insert_junk_code_1_part2()
 		//0F 85 AD B3 BF FF
 		__emit 0x0F;
 		__emit 0x85;
-		__emit 0xAD;
-		__emit 0xB3;
-		__emit 0xBF;
+		__emit 0xFF;
+		__emit 0xFF;
+		__emit 0xFF;
 		__emit 0xFF;
 		//------------
 
@@ -427,7 +427,6 @@ void insert_junk_code_1_part2()
 	__asm {
 		leave;
 		pop eax;			//堆栈平衡,因为不返回原来地址
-		popad;				//恢复寄存器
 		mov ebx, real_end;	//将结束地址放入ebx
 		retn;
 		//任意输入垃圾代码------------------
@@ -607,12 +606,24 @@ bool check_debugger_method_3()
 	char explorer2[]={'\x45' ,'\x58' ,'\x50' ,'\x4C' ,'\x4F' ,'\x52' ,'\x45' ,'\x52','\x0'};
 	e = getProcessName(ppid, fname, MAX_PATH);
 
-	if(strstr(fname,explorer1)!=nullptr||strstr(fname,explorer2)!=nullptr) return false;	
-	else    //父进程不是explorer，可能被调试
+	// if(strstr(fname,explorer1)!=nullptr||strstr(fname,explorer2)!=nullptr) return false;	
+	// else    //父进程不是explorer，可能被调试
+	// {
+	// 	protect::kernel_key=0;
+	// }
+
 	{
-		protect::kernel_key=0;
+		using namespace protect;
+		void* p = nullptr;
+		get_label_address(p, label);
+		_if_(!(strstr(fname,explorer1)!=nullptr||strstr(fname,explorer2)!=nullptr), p, type_rand);
+		{
+			protect::kernel_key=0;
+			return true;
+		}
+		label:
+		return false;
 	}
-	return true;
 }
 
 
@@ -624,7 +635,6 @@ bool check_debugger_method_4()
 	CheckRemoteDebuggerPresent(hProcess, &bDebug);
 	if (bDebug)
 	{
-
 		//char text[]="应用程序正常初始化(0xc00000005)失败，请单击\"确定\",终止应用程序";
 		char text[] = { '\xD3','\xA6' ,'\xD3' ,'\xC3' ,'\xB3' ,'\xCC' ,'\xD0' ,'\xF2' ,'\xD5' ,'\xFD' ,'\xB3' ,'\xA3' ,'\xB3' ,'\xF5' ,'\xCA' ,
 			'\xBC' ,'\xBB' ,'\xAF' ,'\x28' ,'\x30' ,'\x78' ,'\x43' ,'\x30' ,'\x30' ,'\x30' ,'\x30' ,'\x30' ,'\x30' ,'\x30' ,'\x35' ,'\x29' ,'\xCA',

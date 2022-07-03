@@ -8,34 +8,60 @@ using namespace std;
 char input_s[101]={};
 //正确key为mizukiyyds
 char encrypt_s[101]={-0x39,-0x31,-0x13,-0x9,-0x35,-0x31,-0x11,-0x11,-0x27,-0x5,0};
-void encrypt(char* str)
-{
-	for(int i = 0; i < strlen(str); i++)
-	{
-		using namespace protect;
-
-		// long long tmp=str[i];
-		// tmp=sub(tmp,1,type_rand);
-		// tmp=shl_(tmp,2);
-		// tmp=add(tmp,2,type_rand);
-		// tmp=shr_(tmp,1);
-		// tmp=xor_(tmp,kernel_key%64,type_rand);
-		// str[i]=tmp;
-
-		//str[i]={ { [ (str[i]-1) << 2 ] + 2 } >> 1 } ^ ( kernel_key % 256 )
-		const long long result=xor_(shr_(add(shl_(sub(str[i],1,type_rand),2),2,type_rand),1),kernel_key%256,type_rand);
-		str[i]=result;
-	}
-}
+//
+// void encrypt(char* str)
+// {
+// 	// int i=0;
+// 	// long long tmp=(long long)str[i];
+// 	// cout<<tmp<<endl;
+// 	// tmp=109;
+// 	// tmp= protect::sub(tmp,1, protect::type_rand);
+// 	// cout<<tmp<<endl;
+// 	// tmp= protect::shl_(tmp,2);
+// 	// cout<<tmp<<endl;
+// 	// tmp= protect::add(tmp,2, protect::type_rand);
+// 	// cout<<tmp<<endl;
+// 	// tmp= protect::shr_(tmp,1);
+// 	// cout<<tmp<<endl;
+// 	// tmp=xor_(tmp, protect::kernel_key%256, protect::type_rand);
+// 	// cout<<tmp<<endl;
+// 		//str[i]=tmp;
+// 	for(int i = 0; i < strlen(str); i++)
+// 	{
+// 		using namespace protect;
+//
+// 		//int时 shr_没效果
+// 		//long long时 都出错，但在别的地方不出错
+// 		//发现bug:在基本逻辑运算中插入insert_junk_code_1有时出现错误
+//
+// 		// long long tmp=str[i];
+// 		// tmp=sub(tmp,1,type_rand);
+// 		// cout<<tmp<<endl;
+// 		// tmp=shl_(tmp,2);
+// 		// cout<<tmp<<endl;
+// 		// tmp=add(tmp,2,type_rand);
+// 		// cout<<tmp<<endl;
+// 		// tmp=shr_(tmp,1);
+// 		// cout<<tmp<<endl;
+// 		// tmp=xor_(tmp,kernel_key%256,type_rand);
+// 		// cout<<tmp<<endl;
+// 		// str[i]=tmp;
+//
+// 		//str[i]={ { [ (str[i]-1) << 2 ] + 2 } >> 1 } ^ ( kernel_key % 256 )
+// 		 long long result=xor_(shr_(add(shl_(sub(str[i],1,type_rand),2),2,type_rand),1),kernel_key%256,type_rand);
+// 		 str[i]=result;
+// 	}
+// }
 
 bool check(char* input_s,char *encrypt_s)
 {
-	using namespace protect;
+	using namespace protect;	
 	if(strlen(input_s)!=strlen(encrypt_s)) return false;
 	for(int i=0;i<strlen(input_s);i++)
 	{
-		char tmp=xor_(shr_(add(shl_(sub(input_s[i],1,type_rand),2),2,type_rand),1),kernel_key%128,type_rand);
-		if(tmp!=encrypt_s[i]) return false;
+		char tmp=xor_(shr_(add(shl_(sub(input_s[i],1,type_rand),2),2,type_rand),1),kernel_key%256,type_rand);
+		if(cmp(tmp,encrypt_s[i])!=0) return false;
+		
 	}
 	return true;
 }
@@ -43,11 +69,11 @@ bool check(char* input_s,char *encrypt_s)
 extern "C" void func1()
 {
 	{
+		
 		using namespace protect;
-
 		//生成加密字符串
-		// char str[1001]="success";
-		 //print_string(encrypt,str);
+		//char str[1001]="mizukiyyds";
+		//print_string(encrypt,str);
 		//system("pause");
 
 
