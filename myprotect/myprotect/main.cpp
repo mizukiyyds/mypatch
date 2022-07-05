@@ -30,9 +30,7 @@ char encrypt_s[101]={-0x39,-0x31,-0x13,-0x9,-0x35,-0x31,-0x11,-0x11,-0x27,-0x5,0
 // 	{
 // 		using namespace protect;
 //
-// 		//int时 shr_没效果
-// 		//long long时 都出错，但在别的地方不出错
-// 		//发现bug:在基本逻辑运算中插入insert_junk_code_1有时出现错误
+
 //
 // 		// long long tmp=str[i];
 // 		// tmp=sub(tmp,1,type_rand);
