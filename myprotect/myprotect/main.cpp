@@ -1,10 +1,14 @@
-#define _CRT_SECURE_NO_WARNINGS
-#include <iostream>
 #include <windows.h>
-
+#include <iostream>
 #include "myprotect.h"
 using namespace std;
 
+
+/* Crackme代码
+ 
+
+
+ 
 char input_s[101]={};
 //正确key为mizukiyyds
 char encrypt_s[101]={-0x39,-0x31,-0x13,-0x9,-0x35,-0x31,-0x11,-0x11,-0x27,-0x5,0};
@@ -30,7 +34,9 @@ char encrypt_s[101]={-0x39,-0x31,-0x13,-0x9,-0x35,-0x31,-0x11,-0x11,-0x27,-0x5,0
 // 	{
 // 		using namespace protect;
 //
-
+// 		//int时 shr_没效果
+// 		//long long时 都出错，但在别的地方不出错
+// 		//发现bug:在基本逻辑运算中插入insert_junk_code_1有时出现错误
 //
 // 		// long long tmp=str[i];
 // 		// tmp=sub(tmp,1,type_rand);
@@ -76,12 +82,12 @@ extern "C" void func1()
 
 
 		void* p=nullptr;
-		get_label_address(p,label1);
+		GET_LABEL_ADDRESS(p,label1);
 		while(1)
 		{
 			cout<<"输入key：";
 			cin>>input_s;
-			_if_(!(check(input_s,encrypt_s)), p, type_rand);
+			if_(!(check(input_s,encrypt_s)), p, type_rand);
 			{
 				cout << "false\n";
 				system("pause");
@@ -118,18 +124,18 @@ void func2()
 	cout<<"结果：";
 	for(int i=0;i<strlen(result);i++){
 		long long tmp=256;
-		/*
+		
 		 //负数转正数，扩展
-		tmp=add(tmp,sub(input_s[i],encrypt_s[i],type_rand),type_rand);
-		tmp=add(tmp,result[i],type_rand);
-
-		 tmp=add(tmp,0,type_rand);
-		 tmp=xor_(tmp,kernel_key%256,type_rand);
-		 tmp=mul(tmp,2,type_rand);
-		 tmp=sub(tmp,2,type_rand);
-		 tmp=shr_(tmp,2);
-		 tmp=add(tmp,1,type_rand);
-		 */
+		// tmp=add(tmp,sub(input_s[i],encrypt_s[i],type_rand),type_rand);
+		// tmp=add(tmp,result[i],type_rand);
+		//
+		//  tmp=add(tmp,0,type_rand);
+		//  tmp=xor_(tmp,kernel_key%256,type_rand);
+		//  tmp=mul(tmp,2,type_rand);
+		//  tmp=sub(tmp,2,type_rand);
+		//  tmp=shr_(tmp,2);
+		//  tmp=add(tmp,1,type_rand);
+		 
 
 		tmp=add(shr_(sub(mul(xor_(add(add(add(tmp,sub(input_s[i],encrypt_s[i],type_rand),type_rand),result[i],type_rand),0,type_rand),kernel_key%256,type_rand),2,type_rand),2,type_rand),2),1,type_rand);
 		putchar(tmp);
@@ -156,4 +162,32 @@ int main()
 	system("color 3e");
 	insert_junk_code_1(func1,func2);
 	system("pause");
+}
+
+
+*/
+
+
+int main()
+{
+	protect::initialize(666666);
+	int a;
+	cin>>a;
+	void* p=nullptr;
+	//if else 混淆测试
+	IF_ELSE_BEGIN(a>=123456,protect_test)
+	{
+		IF_BEGIN(a==123456,mizukiyyds)
+		{
+			cout<<"等于123456\n";
+		}
+		IF_END(mizukiyyds)
+	}
+	ELSE(protect_test)
+	{
+		cout<<"小于123456\n";
+	}
+	IF_ELSE_END()
+	system("pause");
+	return 0;
 }

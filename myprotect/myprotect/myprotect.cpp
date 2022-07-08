@@ -5,13 +5,23 @@
 #include <winternl.h>
 #include <tlhelp32.h>
 #include <Psapi.h>
+
+#include "myprotect.h"
 using namespace std;
 
 
-#include "myprotect.h"
+
+
+
+
+
+
 
 DWORD getParentPID(DWORD pid);
 int getProcessName(DWORD pid, LPSTR fname, DWORD sz);
+
+
+
 
 
 namespace protect
@@ -238,9 +248,10 @@ namespace protect
 	 * \brief 在调用前添加几条语句，再调用。尽量让成功时表达式为假，跳转。下面是例子\n
 	 * void* p;							\n
 	 * get_label_address(p,label1);		\n
-	 * _if_(!(a == 123), p, type_rand);	\n
+	 *  if_(!(a == 123), p);			\n
 		{								\n
 			cout << "false\n";			\n
+			return;						\n
 		}								\n
 		label1:							\n
 		cout << "true\n";				\n
@@ -249,38 +260,29 @@ namespace protect
 	 * \param address 要跳转到的地址
 	 * 
 	 */
-	extern void _if_(const long long& expression, void* address, const protect_type & type)
+	extern void if_(const long long& expression, void* address, const protect_type & type)
 	{
 		last_error_code=success;
-		long long result = cmp(expression,0,type);
-		//address=(void*)xor_((long long)address,result,type);
-		address=(void*)((long long)address^result);
-		if(result==1) return;
+		long long result=0x11111111;
+		result = cmp(expression,0,type);
+		//如果下面的if被爆破，address会改变,程序会崩溃。只有cmp返回相等，result=0时地址才是正确的（与0异或不改变）
+		address=(void*)xor_((long long)address,result,type);
+		if(result) return;
 		else if(result==0)
 		{
-			//address=(void*)xor_((long long)address,result,type);
-			address=(void*)((long long)address^result);
+			//address=(void*)((long long)address^result);
+			address=(void*)xor_((long long)address,result,type);
 			__asm
 			{
-				nop;
-				nop;
-				nop;
-				nop;
-				nop;
 				mov eax, address;
 				leave;
 				push eax;
+				mov eax,0;
 				retn 4;
 			}
 		}	
-		else
-		{
-			last_error_code=error_impossible;
-		}
+		last_error_code=error_impossible;
 	}
-
-
-
 
 
 
@@ -291,7 +293,6 @@ namespace protect
 	void print_last_error()
 	{
 		printf("last_error_code = %d\n", last_error_code);
-
 	}
 }
 
@@ -615,8 +616,8 @@ bool check_debugger_method_3()
 	{
 		using namespace protect;
 		void* p = nullptr;
-		get_label_address(p, label);
-		_if_(!(strstr(fname,explorer1)!=nullptr||strstr(fname,explorer2)!=nullptr), p, type_rand);
+		GET_LABEL_ADDRESS(p, label);
+		if_(!(strstr(fname,explorer1)!=nullptr||strstr(fname,explorer2)!=nullptr), p, type_rand);
 		{
 			protect::kernel_key=0;
 			return true;

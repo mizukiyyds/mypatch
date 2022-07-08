@@ -1,11 +1,6 @@
 #pragma once
 
 
-//压栈再弹出，把标签地址传递给指针
-#define get_label_address(address,label) __asm push label __asm pop address
-
-//#define if_(expression,label,type)  void* label_addr;\get_label_address(label_addr,label);\_if_(expression,label_addr,type);
-
 
 namespace protect
 {
@@ -16,11 +11,11 @@ namespace protect
 
 
 	extern long long rand_n;
-	extern __forceinline long long get_rand(const long long& l, const long long& r);
+	__forceinline extern long long get_rand(const long long& l, const long long& r);
 
 	extern void initialize(long long kernel_key=987654);				//初始化函数
 
-	//用initial函数设置key 。用于加密和解密，如果检测到程序被调试、更改，key会变为0
+	//用initial函数设置key 。用于加密和解密，如果检测到程序被调试、更改，key会变为0。0与任何数异或为其本身，解密会失败
 	extern long long kernel_key;
 
 
@@ -43,18 +38,14 @@ namespace protect
 	__forceinline extern long long xor_(const long long& n, const long long& m, protect_type type = type_default);
 	__forceinline extern long long xnor(const long long& n, const long long& m, protect_type type = type_default);
 
-	// template<typename T>
-	// __forceinline extern T shl_(const T& n, const int m);
 	__forceinline extern long long shl_(const long long& n, const long long& m);
 	__forceinline extern long long shr_(const long long& n, const long long& m);
-
 
 	__forceinline extern long long add(const long long& n, const long long& m, const protect_type &type = type_default);		//混淆加法
 	__forceinline extern long long sub(const long long& n, const long long& m, const protect_type &type = type_default);		//混淆减法
 	__forceinline extern long long mul(const long long& n, const long long& m, const protect_type &type = type_default);		//混淆乘法
-
 	__forceinline extern long long cmp(const long long& n, const long long& m, const protect_type &type = type_default);		//混淆比较
-	extern void _if_(const long long& expression, void* address, const protect_type &type = type_default);		//混淆if，push ret实现跳转
+	extern void if_(const long long& expression, void* address, const protect_type &type = type_default);		//混淆if，push ret实现跳转
 
 
 
@@ -110,4 +101,72 @@ __forceinline extern void exit_2();
 __forceinline extern void exit_3();
 __forceinline extern void exit_4();
 //----------------------------------------
+
+
+
+
+
+//反斜杠后面不能有多余空格，asm块要包起来并且每一句前要加__asm
+//使用旧式 C 注释 ( /* comment */) 而不是汇编式注释 ( ; comment) 或单行 C 注释 ( // comment)
+
+//压栈再弹出，把标签地址传递给指针
+#define GET_LABEL_ADDRESS(p,label) do{		\
+	void* tmp_p=0;							\
+	__asm{									\
+	__asm push label						\
+	__asm pop tmp_p							\
+	}										\
+	p=tmp_p;								\
+}while(0)
+
+
+
+/**
+ * \brief 混淆if开始标志。如果表达式不成立，将会跳转到IF_END(mark)
+ * 尽量使表达式不成立，即跳过if中间的内容，效果更好
+ * \param expression	判断的表达式
+ * \param mark			以字母开头的标签，与IF_END相对应，不能是已经声明的标签。
+ */
+#define IF_BEGIN(expression,mark) do{			\
+	void* tmp_addr=nullptr;						\
+	GET_LABEL_ADDRESS(tmp_addr,mark);			\
+	if_(expression,tmp_addr,protect::type_rand);
+
+/**
+ * \brief 混淆if结束标志
+ * \param mark 以字母开头的标签，与IF_BEGIN相对应，不能是已经声明的标签。
+ */
+#define IF_END(mark)						\
+	mark:									\
+	break;									\
+	}while(0);								\
+
+
+
+
+/**
+ * \brief 混淆if_else开始标志。如果表达式不成立，将会跳转到ELSE(mark)
+ * 尽量使表达式不成立，即跳过if中间的内容，效果更好
+ * \param expression	判断的表达式
+ * \param mark			以字母开头的标签，与ELSE相对应，不能是已经声明的标签。
+ */
+#define IF_ELSE_BEGIN(expression,mark) do{		\
+	void* tmp_addr=nullptr;						\
+	GET_LABEL_ADDRESS(tmp_addr,mark);			\
+	if_(expression,tmp_addr,protect::type_rand);
+
+/**
+ * \brief 混淆if_else的else开始标志
+ * \param mark 以字母开头的标签，与IF_ELSE_BEGIN相对应，不能是已经声明的标签。
+ */
+#define ELSE(mark)								\
+	break;										\
+	mark:										\
+	__asm nop
+
+/**
+ * \brief 混淆if_else结束标志
+ */
+#define IF_ELSE_END()							\
+	}while(0);
 
